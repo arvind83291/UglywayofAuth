@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 
 const zod = require("zod"); 
+const schema = zod.array(zod.number())// here we are describing the structure of schema
 
 
 const port = 3001;
@@ -32,16 +33,31 @@ app.get("/health-checkup",function (req, res){
 //always use app.use(express.json()) to read the input within the body
 app.post("/kidneylength",function(req,res){
     const kidneys = req.body.kidneys;
-    const kidneyLength=kidneys.length;
-    res.send("you have "+ kidneyLength+ " Kidneys")
+    // const kidneyLength=kidneys.length; //after uncommenting this line zod will not work because the undefined err of kidneylength
+    const response = schema.safeParse(kidneys);
+    res.send(response);
 })
 
-// this is the example of Exception handling midddle ware 
-app.use(function(err,req,res,next){
-    res.json({
-        msg:"Sorry something is Wrong"
-    })
-})
+// this is the example of Exception handling midddle ware always write in the end and only once needed
+// app.use(function(err,req,res,next){
+//     res.json({
+//         msg:"Sorry something is Wrong"
+//     })
+// })
 
-// this is the example of zod where we are 
+
 app.listen(port);
+
+//some zod practice
+// function validateinput(obj){
+//     const schema = zod.object({
+//         email : zod.string().email(),
+//         password : zod.string().min(6).max(12)
+//     })
+//     const response = schema.safeParse(obj);
+//     console.log(response);
+// }
+// validateinput({
+//     email:"Arvind@gmail.com",
+//     password:"123"
+// })
